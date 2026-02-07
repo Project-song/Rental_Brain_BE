@@ -1,9 +1,13 @@
 package com.devoops.rentalbrain.business.contract.query.dto;
 
 import com.devoops.rentalbrain.common.pagination.Criteria;
-import lombok.Data;
+import lombok.*;
 
-@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Getter
+@Setter
+@ToString
 public class ContractSearchDTO extends Criteria {
     private String contractCode;
     private String cusName;
