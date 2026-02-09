@@ -56,7 +56,7 @@ jobs:
               url: jdbc:mariadb://\${RDS_HOSTNAME}:\${RDS_PORT}/\${RDS_DB_NAME}
               username: \${RDS_USERNAME}
               password: \${RDS_PASSWORD}
-          
+            
             jpa:
               generate-ddl: false
               show-sql: true
@@ -64,6 +64,24 @@ jobs:
               properties:
                 hibernate:
                   '[format_sql]': true
+            
+            data:
+              redis:
+                host: localhost
+                port: 6379
+          
+          opensearch:
+            host: localhost
+            port: 9200
+          
+          token:
+            access_secret: dummy_access_secret_dummy_access_secret_dummy_access_secret_dummy_access_secret
+            refresh_secret: dummy_refresh_secret_dummy_refresh_secret_dummy_refresh_secret_dummy_refresh_secret
+            access_expiration_time: 36000000
+            refresh_expiration_time: 86400000
+          
+          
+          
           
           EOL
 
