@@ -39,7 +39,6 @@ jobs:
 
       # MariaDB 데이터베이스 연결을 위한 application.yml 파일을 환경 변수로 생성
       - name: Create application.yml.template
-        working-directory: 01_Backend
         run: |
           mkdir -p src/main/resources
           cat > src/main/resources/application.yml.template <<EOL
@@ -90,7 +89,6 @@ jobs:
 
       # envsubst는 환경 변수를 치환해주는 유틸리티로, 템플릿 파일의 ${VARIABLE} 형태의 변수를 실제 환경 변수 값으로 대체
       - name: Set Yaml
-        working-directory: 01_Backend
         run: |
           envsubst < src/main/resources/application.yml.template > src/main/resources/application.yml
           echo "Generated application.yml:"
@@ -109,7 +107,6 @@ jobs:
         #        이제 test 포함
 #        run: ./gradlew clean build
         shell: bash
-        working-directory: 01_Backend
 
       - name: Get current time
         uses: 1466587594/get-current-time@v2
@@ -148,8 +145,8 @@ jobs:
       - name: Generate deployment package
         run: |
           mkdir -p deploy
-          cp 01_Backend/build/libs/*.jar deploy/application.jar
-          cp 01_Backend/Procfile deploy/Procfile
+          cp build/libs/*.jar deploy/application.jar
+          cp Procfile deploy/Procfile
           cp -r .ebextensions deploy/.ebextensions
           cp -r .platform deploy/.platform
           cd deploy && zip -r deploy.zip .
