@@ -5,10 +5,12 @@ import org.opensearch.client.RestClient;
 import org.opensearch.client.opensearch.OpenSearchClient;
 import org.opensearch.client.transport.rest_client.RestClientTransport;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
+@ConditionalOnProperty(prefix="opensearch", name="host")
 public class OpenSearchConfig {
     @Bean
     public OpenSearchClient openSearchClient(
