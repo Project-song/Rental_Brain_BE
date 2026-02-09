@@ -7,6 +7,9 @@ permissions:
 
 # PR 이벤트 관련해서 워크플로우 실행
 on:
+  push:
+    branches:
+      - "main"
   pull_request:
     types: [opened, reopened, synchronize]
 
@@ -30,12 +33,6 @@ jobs:
         run: chmod +x ./gradlew
         shell: bash
 
-      ##############################################################
-      # 이후 이 부분은 envsubst가 추가될 예정
-      ##############################################################
-
-      ###############################################
-
       # envsubst 설치
       - name: Install envsubst
         run: sudo apt-get install -y gettext
@@ -46,7 +43,7 @@ jobs:
           mkdir -p src/main/resources
           cat > src/main/resources/application.yml.template <<EOL
           server:
-            port: 5000
+            port: ${PORT:5000}
             servlet:
               encoding:
                 charset: UTF-8
@@ -55,9 +52,19 @@ jobs:
           spring:
             datasource:
               driver-class-name: org.mariadb.jdbc.Driver
-              url: jdbc:mariadb://\${RDS_HOSTNAME}:\${RDS_PORT}/\${RDS_DB_NAME}
-              username: \${RDS_USERNAME}
-              password: \${RDS_PASSWORD}
+              url: jdbc:mariadb://${RDS_HOSTNAME}:${RDS_PORT}/${RDS_DB_NAME}?useUnicode=true&characterEncoding=utf8&connectionCollation=utf8mb4_unicode_ci&useSsl=true&requireSsl=true
+              username: ${RDS_USERNAME}
+              password: ${RDS_PASSWORD}
+          
+            hikari:
+              maximum-pool-size: 10
+              minimum-idle: 5
+              idle-timeout: 600000
+              max-lifetime: 1800000
+              connection-timeout: 60000
+              leak-detection-threshold: 10000
+              connection-test-query: SELECT 1
+              validation-timeout: 5000
           
             jpa:
               generate-ddl: false
@@ -101,26 +108,27 @@ jobs:
         run: echo "CurrentTime=${{steps.current-time.outputs.formattedTime}}"
         shell: bash
 
-      - name: ChatGPT codeReviewer
-        uses: anc95/ChatGPT-CodeReview@main
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          # optional
-          MODEL: gpt-5-nano-2025-08-07 # https://platform.openai.com/docs/models
-          OPENAI_API_ENDPOINT: https://api.openai.com/v1
-          LANGUAGE: Korean
-          PROMPT: |
-            이 PR을 Google/Meta/Stripe 수준의 엄격한 코드 리뷰 관점으로 분석해주세요:
-            
-            피드백은:
-              - P0(반드시 수정)/P1(중요)/P2(권장) 우선순위로 분류
-              - 문제보다 해결책 중심으로 제시
-              - 구체적인 코드 예시 포함
-              - "왜" 변경이 필요한지 원칙과 함께 설명
-            
-            최고 수준의 코드만 승인하고, "잘 돌아가니까 괜찮아"는 수용하지 않음.
-            응답 코드는 pr 코드 리뷰에 반드시 이모지를 항상 활용할 것(특히 상대방이 기분나쁘지 않게)
+#      # 이부분 코드 리뷰
+#      - name: ChatGPT codeReviewer
+#        uses: anc95/ChatGPT-CodeReview@main
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+#          # optional
+#          MODEL: gpt-5-nano-2025-08-07 # https://platform.openai.com/docs/models
+#          OPENAI_API_ENDPOINT: https://api.openai.com/v1
+#          LANGUAGE: Korean
+#          PROMPT: |
+#            이 PR을 Google/Meta/Stripe 수준의 엄격한 코드 리뷰 관점으로 분석해주세요:
+#
+#            피드백은:
+#              - P0(반드시 수정)/P1(중요)/P2(권장) 우선순위로 분류
+#              - 문제보다 해결책 중심으로 제시
+#              - 구체적인 코드 예시 포함
+#              - "왜" 변경이 필요한지 원칙과 함께 설명
+#
+#            최고 수준의 코드만 승인하고, "잘 돌아가니까 괜찮아"는 수용하지 않음.
+#            응답 코드는 pr 코드 리뷰에 반드시 이모지를 항상 활용할 것(특히 상대방이 기분나쁘지 않게)
 
       ###############################################
       - name: Generate deployment package
