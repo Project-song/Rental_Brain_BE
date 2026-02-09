@@ -1,43 +1,49 @@
-package com.devoops.rentalbrain.customer.channel.query.controller;
+package com.devoops.rentalbrain.customer.segment.query.controller;
 
+import com.devoops.rentalbrain.common.ai.command.service.AiCommandService;
+import com.devoops.rentalbrain.common.ai.query.service.AiQueryService;
+import com.openai.client.OpenAIClient;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@SpringBootTest
 
-/* 가상의 요청(request)을 테스트 하기 위한 Mock객체 테스트용 설정(요청, 전송, 응답) */
+@SpringBootTest
+// JWT 필터 끄기
 @AutoConfigureMockMvc(addFilters = false)
-class ChannelQueryControllerTest {
+class SegmentQueryControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
 
-    @DisplayName("상태확인")
-    @Test
-    public void healthCheck() throws Exception {
-        mockMvc.perform(get("/health"))
-                .andExpect(status().isOk())
-                .andDo(print());
-    }
+    @Autowired
+    private AiQueryService aiQueryService;
 
-    @DisplayName("4번 채널이 있는지 확인")
-    @Test
-    public void findChannelIdTest() throws Exception {
+    @MockitoBean
+    private OpenAIClient openAIClient;
 
-        mockMvc.perform(get("/channel/channels/4"))
+    @MockitoBean
+    private AiCommandService aiCommandService;
+
+    @DisplayName("이탈위험고객 세그먼트 확인")
+    @Test
+    public void findSegmentIdTest() throws Exception {
+
+        mockMvc.perform(get("/segment/list/4"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.channelId").value(4))
+                .andExpect(jsonPath("$.segmentId").value(4))
                 .andDo(print());
-    }
 
+    }
 
 }
