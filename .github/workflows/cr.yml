@@ -39,9 +39,10 @@ jobs:
 
       # MariaDB 데이터베이스 연결을 위한 application.yml 파일을 환경 변수로 생성
       - name: Create application.yml.template
+        working-directory: 01_Backend
         run: |
           mkdir -p src/main/resources
-          cat > 01_Backend/src/main/resources/application.yml.template <<EOL
+          cat > src/main/resources/application.yml.template <<EOL
           server:
             port: ${PORT:5000}
             servlet:
@@ -148,7 +149,7 @@ jobs:
         run: |
           mkdir -p deploy
           cp 01_Backend/build/libs/*.jar deploy/application.jar
-          cp Procfile deploy/Procfile
+          cp 01_Backend/Procfile deploy/Procfile
           cp -r .ebextensions deploy/.ebextensions
           cp -r .platform deploy/.platform
           cd deploy && zip -r deploy.zip .
