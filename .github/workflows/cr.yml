@@ -39,7 +39,7 @@ jobs:
         run: sudo apt-get install -y gettext
 
       # MariaDB 데이터베이스 연결을 위한 application.yml 파일을 환경 변수로 생성
-      - name: Create application.yml.template
+      - name: Create application-dev.yml.template
         run: |
           mkdir -p src/main/resources
           cat > src/main/resources/application.yml.template <<EOL
@@ -86,6 +86,8 @@ jobs:
         #        run: ./gradlew clean build -x test
         #        이제 test 포함
         run: ./gradlew clean build
+        env:
+          SPRING_PROFILES_ACTIVE: dev
         shell: bash
 
       - name: Get current time
