@@ -14,6 +14,9 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 @AutoConfigureMockMvc(addFilters = false)
 class RentalBrainApplicationTests {
 
+    @MockitoBean
+    private OpenAIClient openAIClient;
+
     @DisplayName("contextLoads")
     @Test
     void contextLoads() {
