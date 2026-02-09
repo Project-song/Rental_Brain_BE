@@ -21,6 +21,7 @@ import com.openai.models.responses.ResponseCreateParams;
 import lombok.extern.slf4j.Slf4j;
 import org.opensearch.client.opensearch.core.SearchResponse;
 import org.opensearch.client.opensearch.core.search.Hit;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.openai.models.responses.ResponseOutputText;
@@ -36,6 +37,7 @@ import java.util.List;
 import java.util.Map;
 
 @Service
+@Profile("!test")
 @Slf4j
 public class AiCommandServiceImpl implements AiCommandService {
     private final OpenAIClient openAIClient;

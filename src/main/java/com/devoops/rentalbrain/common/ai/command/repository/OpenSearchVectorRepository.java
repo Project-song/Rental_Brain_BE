@@ -9,6 +9,7 @@ import org.opensearch.client.opensearch._types.query_dsl.Query;
 import org.opensearch.client.opensearch.core.IndexRequest;
 import org.opensearch.client.opensearch.core.SearchRequest;
 import org.opensearch.client.opensearch.core.SearchResponse;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Repository;
 import org.opensearch.client.opensearch._types.aggregations.Aggregate;
 
@@ -23,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 
 @Repository
+@Profile("!test")
 @Slf4j
 public class OpenSearchVectorRepository {
     private final OpenSearchClient client;
