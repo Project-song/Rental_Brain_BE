@@ -23,7 +23,6 @@ import static org.springframework.security.config.Customizer.withDefaults;
 
 @Profile("prod")
 @Configuration
-@EnableWebSecurity
 public class WebSecurity {
     private Environment env;
     private final JwtAuthenticationProvider jwtAuthenticationProvider;

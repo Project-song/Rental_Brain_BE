@@ -39,10 +39,10 @@ jobs:
         run: sudo apt-get install -y gettext
 
       # MariaDB 데이터베이스 연결을 위한 application.yml 파일을 환경 변수로 생성
-      - name: Create application-dev.yml.template
+      - name: Create application.yml.template
         run: |
           mkdir -p src/main/resources
-          cat > src/main/resources/application-dev.yml.template <<EOL
+          cat > src/main/resources/application.yml.template <<EOL
           server:
             port: 5000
             servlet:
@@ -70,39 +70,35 @@ jobs:
                 host: localhost
                 port: 6379
           
-          opensearch:
-            host: localhost
-            port: 9200
-          
-          token:
-            access_secret: kqyT0btD7P3QA8RnLEtYdOY0vJdeKmo7fsL8bhfd+ICGmaOpYJQm5rUFkrJe9L/dULZUYuqE6DRkCuJt3hjDVQ==
-            refresh_secret: JAJh5KPGaZ27mWSIm88QgafVMAlqpjeGEozhUsEDlmflx3tpCUHmtXOogzWSSA6UxFQdUiRMH8uagHRKGpf9Ag==
-            access_expiration_time: 36000000
-            refresh_expiration_time: 86400000
-          
           EOL
 
       # envsubst는 환경 변수를 치환해주는 유틸리티로, 템플릿 파일의 ${VARIABLE} 형태의 변수를 실제 환경 변수 값으로 대체
       - name: Set Yaml
         run: |
-          envsubst < src/main/resources/application-dev.yml.template > src/main/resources/application-dev.yml
-          echo "Generated application-dev.yml:"
-          cat src/main/resources/application-dev.yml
+          envsubst < src/main/resources/application.yml.template > src/main/resources/application.yml
+          echo "Generated application.yml:"
+          cat src/main/resources/application.yml
         env:
           RDS_HOSTNAME: ${{ secrets.RDS_HOSTNAME }}
           RDS_PORT: ${{ secrets.RDS_PORT }}
           RDS_DB_NAME: ${{ secrets.RDS_DB_NAME }}
           RDS_USERNAME: ${{ secrets.RDS_USERNAME }}
           RDS_PASSWORD: ${{ secrets.RDS_PASSWORD }}
-
       ###############################################
 
-      - name: Build with Gradle
+      - name: Build (skip tests)
         #        run: ./gradlew clean build -x test
         #        이제 test 포함
-        run: ./gradlew clean build
+        run: ./gradlew clean build -x test
         env:
           SPRING_PROFILES_ACTIVE: dev
+        shell: bash
+
+        #        여긴 test 만 진행
+      - name: Test (use test profile)
+        run: ./gradlew test
+        env:
+          SPRING_PROFILES_ACTIVE: test
         shell: bash
 
       - name: Get current time
