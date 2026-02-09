@@ -12,7 +12,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
-
 /* 가상의 요청(request)을 테스트 하기 위한 Mock객체 테스트용 설정(요청, 전송, 응답) */
 @AutoConfigureMockMvc(addFilters = false)
 class ChannelQueryControllerTest {

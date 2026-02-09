@@ -75,10 +75,10 @@ jobs:
             port: 9200
           
           token:
-              access_secret: YWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYQ==
-              refresh_secret: YmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYmJiYg==
-              access_expiration_time: 36000000
-              refresh_expiration_time: 86400000
+            access_secret: kqyT0btD7P3QA8RnLEtYdOY0vJdeKmo7fsL8bhfd+ICGmaOpYJQm5rUFkrJe9L/dULZUYuqE6DRkCuJt3hjDVQ==
+            refresh_secret: JAJh5KPGaZ27mWSIm88QgafVMAlqpjeGEozhUsEDlmflx3tpCUHmtXOogzWSSA6UxFQdUiRMH8uagHRKGpf9Ag==
+            access_expiration_time: 36000000
+            refresh_expiration_time: 86400000
           
           EOL
 
