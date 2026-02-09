@@ -92,9 +92,9 @@ jobs:
       ###############################################
 
       - name: Build with Gradle
-        #        run: ./gradlew clean build -x test
+        run: ./gradlew clean build -x test
         #        이제 test 포함
-        run: ./gradlew clean build
+#        run: ./gradlew clean build
         shell: bash
 
       - name: Get current time
