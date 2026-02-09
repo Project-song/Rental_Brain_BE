@@ -1,6 +1,5 @@
 package com.devoops.rentalbrain;
 
-import com.devoops.rentalbrain.common.ai.command.service.AiCommandService;
 import com.openai.client.OpenAIClient;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

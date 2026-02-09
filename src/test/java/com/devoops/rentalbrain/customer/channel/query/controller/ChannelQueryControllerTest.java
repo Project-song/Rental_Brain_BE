@@ -1,28 +1,34 @@
 package com.devoops.rentalbrain.customer.channel.query.controller;
 
+import com.openai.client.OpenAIClient;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+
 @SpringBootTest
-/* 가상의 요청(request)을 테스트 하기 위한 Mock객체 테스트용 설정(요청, 전송, 응답) */
-@AutoConfigureMockMvc(addFilters = false)
+@AutoConfigureMockMvc(addFilters = false) // 시큐리티 필터로 막히면 우선 끄고 진행
 class ChannelQueryControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
 
+    @MockitoBean
+    private OpenAIClient openAIClient;
+
     @DisplayName("상태확인")
     @Test
     public void healthCheck() throws Exception {
-        mockMvc.perform(get("/health"))
+        mockMvc.perform(get("/channel/health"))
                 .andExpect(status().isOk())
                 .andDo(print());
     }
