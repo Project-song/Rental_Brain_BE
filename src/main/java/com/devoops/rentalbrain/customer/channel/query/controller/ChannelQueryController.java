@@ -36,6 +36,7 @@ public class ChannelQueryController {
         return "Channel OK";
     }
 
+
     // 채널 전체 조회
     @Operation(
             summary = "채널 목록 조회",
@@ -84,5 +85,12 @@ public class ChannelQueryController {
 
         ChannelTotalSumDTO summary = channelQueryService.selectChannelTotalSum();
         return ResponseEntity.ok(summary);
+    }
+
+    // RDS test
+    @GetMapping("/channels/{channelId}")
+    public ResponseEntity<ChannelQueryDTO> getChannel(@PathVariable("channelId") Integer channelId) {
+        ChannelQueryDTO dto = channelQueryService.findChannelByChannelId(channelId);
+        return ResponseEntity.ok(dto);
     }
 }
