@@ -6,6 +6,7 @@ import com.devoops.rentalbrain.common.ai.common.EmbeddingDTO;
 import com.devoops.rentalbrain.common.ai.command.service.AiCommandService;
 import com.openai.models.responses.Response;
 import com.openai.models.responses.ResponseOutputText;
+import org.springframework.context.annotation.Profile;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -13,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
+@Profile("!test")
 @RequestMapping("/ai")
 public class AiController {
     private final AiCommandService aiCommandService;

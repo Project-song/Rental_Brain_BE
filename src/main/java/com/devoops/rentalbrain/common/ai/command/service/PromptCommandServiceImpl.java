@@ -1,11 +1,13 @@
 package com.devoops.rentalbrain.common.ai.command.service;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
+@Profile("!test")
 @Slf4j
 public class PromptCommandServiceImpl implements PromptCommandService {
 
