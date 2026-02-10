@@ -37,8 +37,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Slf4j
-@Profile("prod")
-@Component
 public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
     private final Environment env;

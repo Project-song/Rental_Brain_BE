@@ -21,7 +21,6 @@ import java.util.Collections;
 
 import static org.springframework.security.config.Customizer.withDefaults;
 
-@Profile("prod")
 @Configuration
 public class WebSecurity {
     private Environment env;

@@ -52,7 +52,7 @@ jobs:
           spring:
             datasource:
               driver-class-name: org.mariadb.jdbc.Driver
-              url: jdbc:mariadb://${RDS_HOSTNAME}:${RDS_PORT}/${RDS_DB_NAME}?useUnicode=true&characterEncoding=utf8&connectionCollation=utf8mb4_unicode_ci
+              url: jdbc:mariadb://${RDS_HOSTNAME}:${RDS_PORT}/${RDS_DB_NAME}?useUnicode=true&characterEncoding=utf8&connectionCollation=utf8mb4_unicode_ci&useSsl=true&requireSsl=true&sslMode=TRUST
               username: ${RDS_USERNAME}
               password: ${RDS_PASSWORD}
 
@@ -119,27 +119,27 @@ jobs:
         run: echo "CurrentTime=${{steps.current-time.outputs.formattedTime}}"
         shell: bash
 
-#      # 이부분 코드 리뷰
-#      - name: ChatGPT codeReviewer
-#        uses: anc95/ChatGPT-CodeReview@main
-#        env:
-#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-#          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-#          # optional
-#          MODEL: gpt-5-nano-2025-08-07 # https://platform.openai.com/docs/models
-#          OPENAI_API_ENDPOINT: https://api.openai.com/v1
-#          LANGUAGE: Korean
-#          PROMPT: |
-#            이 PR을 Google/Meta/Stripe 수준의 엄격한 코드 리뷰 관점으로 분석해주세요:
-#
-#            피드백은:
-#              - P0(반드시 수정)/P1(중요)/P2(권장) 우선순위로 분류
-#              - 문제보다 해결책 중심으로 제시
-#              - 구체적인 코드 예시 포함
-#              - "왜" 변경이 필요한지 원칙과 함께 설명
-#
-#            최고 수준의 코드만 승인하고, "잘 돌아가니까 괜찮아"는 수용하지 않음.
-#            응답 코드는 pr 코드 리뷰에 반드시 이모지를 항상 활용할 것(특히 상대방이 기분나쁘지 않게)
+      # 이부분 코드 리뷰
+      - name: ChatGPT codeReviewer
+        uses: anc95/ChatGPT-CodeReview@main
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          # optional
+          MODEL: gpt-5-nano-2025-08-07 # https://platform.openai.com/docs/models
+          OPENAI_API_ENDPOINT: https://api.openai.com/v1
+          LANGUAGE: Korean
+          PROMPT: |
+            이 PR을 Google/Meta/Stripe 수준의 엄격한 코드 리뷰 관점으로 분석해주세요:
+
+            피드백은:
+              - P0(반드시 수정)/P1(중요)/P2(권장) 우선순위로 분류
+              - 문제보다 해결책 중심으로 제시
+              - 구체적인 코드 예시 포함
+              - "왜" 변경이 필요한지 원칙과 함께 설명
+
+            최고 수준의 코드만 승인하고, "잘 돌아가니까 괜찮아"는 수용하지 않음.
+            응답 코드는 pr 코드 리뷰에 반드시 이모지를 항상 활용할 것(특히 상대방이 기분나쁘지 않게)
 
       ###############################################
       - name: Generate deployment package
@@ -151,26 +151,26 @@ jobs:
           cp -r .platform deploy/.platform
           cd deploy && zip -r deploy.zip .
 
-      - name: Check Beanstalk Environment Status
-        run: |
-          STATUS=$(aws elasticbeanstalk describe-environments --region ap-northeast-2 \
-            --environment-names Song-b-env --query "Environments[0].Status" \
-            --output text)
-          if [ "$STATUS" != "Ready" ]; then
-            echo "Environment is not Ready (current status: $STATUS)."
-            exit 1
-          fi
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+#      - name: Check Beanstalk Environment Status
+#        run: |
+#          STATUS=$(aws elasticbeanstalk describe-environments --region ap-northeast-2 \
+#            --environment-names Rentalbrain-b-env --query "Environments[0].Status" \
+#            --output text)
+#          if [ "$STATUS" != "Ready" ]; then
+#            echo "Environment is not Ready (current status: $STATUS)."
+#            exit 1
+#          fi
+#        env:
+#          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+#          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
       - name: Beanstalk Deploy
         uses: einaregilsson/beanstalk-deploy@v22
         with:
           aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          application_name: song-b
-          environment_name: Song-b-env
+          application_name: rentalbrain-b
+          environment_name: Rentalbrain-b-env
           version_label: github-action-${{steps.current-time.outputs.formattedTime}}
           region: ap-northeast-2
           deployment_package: deploy/deploy.zip

@@ -37,7 +37,6 @@ import java.util.List;
 import java.util.Map;
 
 @Service
-@Profile("!test")
 @Slf4j
 public class AiCommandServiceImpl implements AiCommandService {
     private final OpenAIClient openAIClient;

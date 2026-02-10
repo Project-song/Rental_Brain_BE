@@ -7,7 +7,6 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-@Profile("!test")
 @Slf4j
 public class PromptCommandServiceImpl implements PromptCommandService {
 
