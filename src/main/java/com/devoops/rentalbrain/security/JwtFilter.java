@@ -21,8 +21,6 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 
 @Slf4j
-@Profile("prod")
-@Component
 public class JwtFilter extends OncePerRequestFilter {
 
     private final JwtUtil jwtUtil;

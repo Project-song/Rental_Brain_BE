@@ -8,7 +8,6 @@ import org.springframework.context.annotation.Profile;
 
 
 @Configuration
-@Profile("!test")
 public class OpenAiConfig {
 
     @Bean

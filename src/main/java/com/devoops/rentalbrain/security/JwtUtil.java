@@ -19,7 +19,6 @@ import java.security.Key;
 import java.util.List;
 
 @Slf4j
-@Profile("prod")
 @Component
 public class JwtUtil {
     private final Key key;

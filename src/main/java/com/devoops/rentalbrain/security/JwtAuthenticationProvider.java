@@ -15,7 +15,6 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Slf4j
-@Profile("prod")
 public class JwtAuthenticationProvider implements AuthenticationProvider {
     private final EmployeeCommandService employeeCommandService;
     private final PasswordEncoder passwordEncoder;

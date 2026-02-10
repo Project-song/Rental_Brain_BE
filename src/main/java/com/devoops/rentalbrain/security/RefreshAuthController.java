@@ -20,7 +20,6 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-@Profile("prod")
 @RestController
 @RequestMapping("/auth")
 @Slf4j
