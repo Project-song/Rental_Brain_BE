@@ -72,10 +72,8 @@ jobs:
                 max-request-size: 20MB
             data:
                 redis:
-                  host: ${SPRING_DATA_REDIS_HOST}
-                  port: ${SPRING_DATA_REDIS_PORT:6379}
-                  password: ${SPRING_DATA_REDIS_PASSWORD}
-                  timeout: 5000ms
+                  host: localhost
+                  port: ${PORT:6379}
           
             jpa:
               generate-ddl: false
@@ -161,7 +159,6 @@ jobs:
           cp build/libs/*.jar deploy/application.jar
           cp Procfile deploy/Procfile
           cp -r .ebextensions deploy/.ebextensions
-          cp src/main/resources/application.yml deploy/application.yml
           cp -r .platform deploy/.platform
           cd deploy && zip -r deploy.zip .
 
@@ -178,17 +175,17 @@ jobs:
 #          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
 #          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
-#      - name: Beanstalk Deploy
-#        uses: einaregilsson/beanstalk-deploy@v22
-#        with:
-#          aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
-#          aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-#          application_name: rentalbrain-b
-#          environment_name: Rentalbrain-b-env
-#          version_label: github-action-${{steps.current-time.outputs.formattedTime}}
-#          region: ap-northeast-2
-#          deployment_package: deploy/deploy.zip
-#          use_existing_version_if_available: false
-#          wait_for_deployment: true
-#          wait_for_environment_recovery: 300
+      - name: Beanstalk Deploy
+        uses: einaregilsson/beanstalk-deploy@v22
+        with:
+          aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          application_name: rentalbrain-b
+          environment_name: Rentalbrain-b-env
+          version_label: github-action-${{steps.current-time.outputs.formattedTime}}
+          region: ap-northeast-2
+          deployment_package: deploy/deploy.zip
+          use_existing_version_if_available: false
+          wait_for_deployment: true
+          wait_for_environment_recovery: 300
   ###############################################
