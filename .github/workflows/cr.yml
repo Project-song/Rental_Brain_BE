@@ -41,7 +41,7 @@ jobs:
       - name: Create application.yml.template
         run: |
           mkdir -p src/main/resources
-          cat > src/main/resources/application.yml.template <<'EOL'
+          cat > src/main/resources/application.yml.template << EOL
           server:
             port: ${PORT:5000}
             servlet:
@@ -72,8 +72,10 @@ jobs:
                 max-request-size: 20MB
             data:
                 redis:
-                  host: localhost
-                  port: ${PORT:6379}
+                  host: ${SPRING_DATA_REDIS_HOST}
+                  port: ${SPRING_DATA_REDIS_PORT:6379}
+                  password: ${SPRING_DATA_REDIS_PASSWORD}
+                  timeout: 5000ms
           
             jpa:
               generate-ddl: false
@@ -110,6 +112,8 @@ jobs:
           RDS_DB_NAME: ${{ secrets.RDS_DB_NAME }}
           RDS_USERNAME: ${{ secrets.RDS_USERNAME }}
           RDS_PASSWORD: ${{ secrets.RDS_PASSWORD }}
+          TOKEN_ACCESS_SECRET: ${{ secrets.TOKEN_ACCESS_SECRET }}
+          TOKEN_REFRESH_SECRET: ${{ secrets.TOKEN_ACCESS_SECRET }}
 
       ###############################################
 
