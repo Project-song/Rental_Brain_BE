@@ -43,7 +43,7 @@ jobs:
           mkdir -p src/main/resources
           cat > src/main/resources/application.yml.template << EOL
           server:
-            port: ${PORT:5000}
+            port: 5000
             servlet:
               encoding:
                 charset: UTF-8
@@ -186,7 +186,7 @@ jobs:
           aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           application_name: rental-brain-b
           environment_name: Rental-brain-b-env
-          version_label: github-action-${{steps.current-time.outputs.formattedTime}}
+          version_label: github-action-${{ github.sha }}
           region: ap-northeast-2
           deployment_package: deploy/deploy.zip
           use_existing_version_if_available: false
