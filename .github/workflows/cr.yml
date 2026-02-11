@@ -41,7 +41,7 @@ jobs:
       - name: Create application.yml.template
         run: |
           mkdir -p src/main/resources
-          cat > 01_Backend/src/main/resources/application.yml.template <<'EOL'
+          cat > rentalbrain/src/main/resources/application.yml.template <<'EOL'
           server:
             port: ${PORT:5000}
             servlet:
@@ -111,7 +111,7 @@ jobs:
 
       # envsubst는 환경 변수를 치환해주는 유틸리티로, 템플릿 파일의 ${VARIABLE} 형태의 변수를 실제 환경 변수 값으로 대체
       - name: Set Yaml
-        working-directory: 01_Backend
+        working-directory: rentalbrain
         run: |
           envsubst < src/main/resources/application.yml.template \
                    > src/main/resources/application.yml
@@ -172,7 +172,7 @@ jobs:
       - name: Generate deployment package
         run: |
           mkdir -p deploy
-          cp 01_Backend/build/libs/*.jar deploy/application.jar
+          cp rentalbrain/build/libs/*.jar deploy/application.jar
           cp Procfile deploy/Procfile
           cp -r .ebextensions deploy/.ebextensions
           cp -r .platform deploy/.platform
