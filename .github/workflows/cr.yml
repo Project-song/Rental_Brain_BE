@@ -7,13 +7,18 @@ permissions:
 
 # PR 이벤트 관련해서 워크플로우 실행
 on:
-  pull_request:
-    types: [opened, reopened, synchronize]
+  push:
+    branches:
+      - "main"
+#  pull_request:
+#    types: [opened, reopened, synchronize]
 
 # 워크플로우 실행 작업 정의
 jobs:
   test:
     runs-on: ubuntu-latest
+    env:
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -28,12 +33,105 @@ jobs:
         run: chmod +x ./gradlew
         shell: bash
 
-      ##############################################################
-      # 이후 이 부분은 envsubst가 추가될 예정
-      ##############################################################
+      # envsubst 설치
+      - name: Install envsubst
+        run: sudo apt-get install -y gettext
+
+      # MariaDB 데이터베이스 연결을 위한 application.yml 파일을 환경 변수로 생성
+      - name: Create application.yml.template
+        run: |
+          mkdir -p src/main/resources
+          cat > rentalbrain/src/main/resources/application.yml.template <<'EOL'
+          server:
+            port: ${PORT:5000}
+            servlet:
+              encoding:
+                charset: UTF-8
+                force: true
+
+          spring:
+            datasource:
+              driver-class-name: org.mariadb.jdbc.Driver
+              url: jdbc:mariadb://${RDS_HOSTNAME}:${RDS_PORT}/${RDS_DB_NAME}?useUnicode=true&characterEncoding=utf8&connectionCollation=utf8mb4_unicode_ci&useSsl=true&requireSsl=true&sslMode=TRUST
+              username: ${RDS_USERNAME}
+              password: ${RDS_PASSWORD}
+
+              hikari:
+                maximum-pool-size: 10
+                minimum-idle: 5
+                idle-timeout: 600000
+                max-lifetime: 1800000
+                connection-timeout: 60000
+                leak-detection-threshold: 10000
+                connection-test-query: SELECT 1
+                validation-timeout: 5000
+
+            servlet:
+              multipart:
+                max-file-size: 20MB
+                max-request-size: 20MB
+            data:
+                redis:
+                  host: ${SPRING_DATA_REDIS_HOST}
+                  port: ${SPRING_DATA_REDIS_PORT:6379}
+                  password: ${SPRING_DATA_REDIS_PASSWORD}
+                  timeout: 5000ms
+          
+            jpa:
+              generate-ddl: false
+              show-sql: true
+              database-platform: org.hibernate.dialect.MySQLDialect
+              properties:
+                hibernate:
+                  '[format_sql]': true
+          
+          token:
+            access_secret: ${TOKEN_ACCESS_SECRET}
+            refresh_secret: ${TOKEN_REFRESH_SECRET}
+            access_expiration_time: 36000000
+            refresh_expiration_time: 86400000
+          
+          openai:
+            api-key: ${OPENAI_API_KEY}
+          
+          opensearch:
+            host: localhost
+            port: 9200
+
+          EOL
+
+        env:
+          RDS_HOSTNAME: ${{ secrets.RDS_HOSTNAME }}
+          RDS_PORT: ${{ secrets.RDS_PORT }}
+          RDS_DB_NAME: ${{ secrets.RDS_DB_NAME }}
+          RDS_USERNAME: ${{ secrets.RDS_USERNAME }}
+          RDS_PASSWORD: ${{ secrets.RDS_PASSWORD }}
+          TOKEN_ACCESS_SECRET: ${{ secrets.TOKEN_ACCESS_SECRET }}
+          TOKEN_REFRESH_SECRET: ${{ secrets.TOKEN_REFRESH_SECRET }}
+
+      # envsubst는 환경 변수를 치환해주는 유틸리티로, 템플릿 파일의 ${VARIABLE} 형태의 변수를 실제 환경 변수 값으로 대체
+      - name: Set Yaml
+        working-directory: rentalbrain
+        run: |
+          envsubst < src/main/resources/application.yml.template \
+                   > src/main/resources/application.yml
+          echo "Generated application.yml:"
+          cat src/main/resources/application.yml
+        env:
+          RDS_HOSTNAME: ${{ secrets.RDS_HOSTNAME }}
+          RDS_PORT: ${{ secrets.RDS_PORT }}
+          RDS_DB_NAME: ${{ secrets.RDS_DB_NAME }}
+          RDS_USERNAME: ${{ secrets.RDS_USERNAME }}
+          RDS_PASSWORD: ${{ secrets.RDS_PASSWORD }}
+          TOKEN_ACCESS_SECRET: ${{ secrets.TOKEN_ACCESS_SECRET }}
+          TOKEN_REFRESH_SECRET: ${{ secrets.TOKEN_REFRESH_SECRET }}
+
+      ###############################################
 
       - name: Build with Gradle
         run: ./gradlew clean build -x test
+        working-directory: 01_Backend
+        #        이제 test 포함
         #        run: ./gradlew clean build
         shell: bash
 
@@ -48,23 +146,62 @@ jobs:
         run: echo "CurrentTime=${{steps.current-time.outputs.formattedTime}}"
         shell: bash
 
-      - name: ChatGPT codeReviewer
-        uses: anc95/ChatGPT-CodeReview@main
+      #      # 이부분 코드 리뷰
+      #      - name: ChatGPT codeReviewer
+      #        uses: anc95/ChatGPT-CodeReview@main
+      #        env:
+      #          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      #          # optional
+      #          MODEL: gpt-5-nano-2025-08-07 # https://platform.openai.com/docs/models
+      #          OPENAI_API_ENDPOINT: https://api.openai.com/v1
+      #          LANGUAGE: Korean
+      #          PROMPT: |
+      #            이 PR을 Google/Meta/Stripe 수준의 엄격한 코드 리뷰 관점으로 분석해주세요:
+      #
+      #            피드백은:
+      #              - P0(반드시 수정)/P1(중요)/P2(권장) 우선순위로 분류
+      #              - 문제보다 해결책 중심으로 제시
+      #              - 구체적인 코드 예시 포함
+      #              - "왜" 변경이 필요한지 원칙과 함께 설명
+      #
+      #            최고 수준의 코드만 승인하고, "잘 돌아가니까 괜찮아"는 수용하지 않음.
+      #            응답 코드는 pr 코드 리뷰에 반드시 이모지를 항상 활용할 것(특히 상대방이 기분나쁘지 않게)
+
+      ###############################################
+      - name: Generate deployment package
+        run: |
+          mkdir -p deploy
+          cp rentalbrain/build/libs/*.jar deploy/application.jar
+          cp Procfile deploy/Procfile
+          cp -r .ebextensions deploy/.ebextensions
+          cp -r .platform deploy/.platform
+          cd deploy && zip -r deploy.zip .
+
+      - name: Check Beanstalk Environment Status
+        run: |
+          STATUS=$(aws elasticbeanstalk describe-environments --region ap-northeast-2 \
+            --environment-names Rental-brain-b-env --query "Environments[0].Status" \
+            --output text)
+          if [ "$STATUS" != "Ready" ]; then
+            echo "Environment is not Ready (current status: $STATUS)."
+            exit 1
+          fi
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          # optional
-          MODEL: GPT-5 nano # https://platform.openai.com/docs/models
-          OPENAI_API_ENDPOINT: https://api.openai.com/v1
-          LANGUAGE: Korean
-          PROMPT: |
-            이 PR을 Google/Meta/Stripe 수준의 엄격한 코드 리뷰 관점으로 분석해주세요:
-            
-            피드백은:
-              - P0(반드시 수정)/P1(중요)/P2(권장) 우선순위로 분류
-              - 문제보다 해결책 중심으로 제시
-              - 구체적인 코드 예시 포함
-              - "왜" 변경이 필요한지 원칙과 함께 설명
-            
-            최고 수준의 코드만 승인하고, "잘 돌아가니까 괜찮아"는 수용하지 않음.
-            응답 코드는 pr 코드 리뷰에 반드시 이모지를 항상 활용할 것(특히 상대방이 기분나쁘지 않게)
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+      - name: Beanstalk Deploy
+        uses: einaregilsson/beanstalk-deploy@v22
+        with:
+          aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          application_name: rental-brain-b
+          environment_name: Rental-brain-b-env
+          version_label: github-action-${{ github.sha }}
+          region: ap-northeast-2
+          deployment_package: deploy/deploy.zip
+          use_existing_version_if_available: false
+          wait_for_deployment: true
+          wait_for_environment_recovery: 300
+  ###############################################
