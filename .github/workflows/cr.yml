@@ -10,8 +10,8 @@ on:
   push:
     branches:
       - "main"
-  pull_request:
-    types: [opened, reopened, synchronize]
+#  pull_request:
+#    types: [opened, reopened, synchronize]
 
 # 워크플로우 실행 작업 정의
 jobs:
@@ -99,6 +99,15 @@ jobs:
             port: 9200
 
           EOL
+
+        env:
+          RDS_HOSTNAME: ${{ secrets.RDS_HOSTNAME }}
+          RDS_PORT: ${{ secrets.RDS_PORT }}
+          RDS_DB_NAME: ${{ secrets.RDS_DB_NAME }}
+          RDS_USERNAME: ${{ secrets.RDS_USERNAME }}
+          RDS_PASSWORD: ${{ secrets.RDS_PASSWORD }}
+          TOKEN_ACCESS_SECRET: ${{ secrets.TOKEN_ACCESS_SECRET }}
+          TOKEN_REFRESH_SECRET: ${{ secrets.TOKEN_REFRESH_SECRET }}
 
       # envsubst는 환경 변수를 치환해주는 유틸리티로, 템플릿 파일의 ${VARIABLE} 형태의 변수를 실제 환경 변수 값으로 대체
       - name: Set Yaml
