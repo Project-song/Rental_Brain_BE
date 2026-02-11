@@ -1,3 +1,14 @@
 spring:
   profiles:
     active: dev
+  server:
+    port: 5000
+
+  application:
+    name: rentalbrain
+  datasource:
+    driver-class-name: org.mariadb.jdbc.Driver
+    #    RDS
+    url: jdbc:mariadb://${RDS_HOSTNAME}:${RDS_PORT}/${RDS_DB_NAME}?useUnicode=true&characterEncoding=utf8&connectionCollation=utf8mb4_unicode_ci&useSsl=true&requireSsl=true&sslMode=TRUST
+    username: ${RDS_USERNAME}
+    password: ${RDS_PASSWORD}
