@@ -1,1 +1,1 @@
-web: java -Dfile.encoding=UTF-8 -Dserver.port=5000 -jar application.jar
+web: appstart
