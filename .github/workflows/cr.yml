@@ -41,9 +41,9 @@ jobs:
       - name: Create application.yml.template
         run: |
           mkdir -p src/main/resources
-          cat > src/main/resources/application.yml.template << EOL
+          cat > 01_Backend/src/main/resources/application.yml.template <<'EOL'
           server:
-            port: 5000
+            port: ${PORT:5000}
             servlet:
               encoding:
                 charset: UTF-8
@@ -80,7 +80,7 @@ jobs:
             jpa:
               generate-ddl: false
               show-sql: true
-              database: mysql
+              database-platform: org.hibernate.dialect.MySQLDialect
               properties:
                 hibernate:
                   '[format_sql]': true
@@ -111,8 +111,10 @@ jobs:
 
       # envsubst는 환경 변수를 치환해주는 유틸리티로, 템플릿 파일의 ${VARIABLE} 형태의 변수를 실제 환경 변수 값으로 대체
       - name: Set Yaml
+        working-directory: 01_Backend
         run: |
-          envsubst < src/main/resources/application.yml.template > src/main/resources/application.yml
+          envsubst < src/main/resources/application.yml.template \
+                   > src/main/resources/application.yml
           echo "Generated application.yml:"
           cat src/main/resources/application.yml
         env:
@@ -128,6 +130,7 @@ jobs:
 
       - name: Build with Gradle
         run: ./gradlew clean build -x test
+        working-directory: 01_Backend
         #        이제 test 포함
 #        run: ./gradlew clean build
         shell: bash
@@ -169,7 +172,7 @@ jobs:
       - name: Generate deployment package
         run: |
           mkdir -p deploy
-          cp build/libs/*.jar deploy/application.jar
+          cp 01_Backend/build/libs/*.jar deploy/application.jar
           cp Procfile deploy/Procfile
           cp -r .ebextensions deploy/.ebextensions
           cp -r .platform deploy/.platform
