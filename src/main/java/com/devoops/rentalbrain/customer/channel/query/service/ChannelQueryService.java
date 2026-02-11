@@ -3,6 +3,7 @@ package com.devoops.rentalbrain.customer.channel.query.service;
 import com.devoops.rentalbrain.customer.channel.query.dto.ChannelKpiQueryDTO;
 import com.devoops.rentalbrain.customer.channel.query.dto.ChannelQueryDTO;
 import com.devoops.rentalbrain.customer.channel.query.dto.ChannelTotalSumDTO;
+import org.springframework.http.ResponseEntity;
 
 import java.util.List;
 
@@ -11,4 +12,5 @@ public interface ChannelQueryService {
     List<ChannelKpiQueryDTO> selectChannelKpi(String channelName);
     ChannelTotalSumDTO selectChannelTotalSum();
 
+    ChannelQueryDTO findChannelByChannelId(Integer channelId);
 }

@@ -1,11 +1,15 @@
 package com.devoops.rentalbrain.customer.channel.query.service;
 
+import com.devoops.rentalbrain.customer.channel.command.entity.ChannelCommandEntity;
+import com.devoops.rentalbrain.customer.channel.command.repository.ChannelRepository;
 import com.devoops.rentalbrain.customer.channel.query.dto.ChannelKpiQueryDTO;
 import com.devoops.rentalbrain.customer.channel.query.dto.ChannelQueryDTO;
 import com.devoops.rentalbrain.customer.channel.query.dto.ChannelTotalSumDTO;
 import com.devoops.rentalbrain.customer.channel.query.mapper.ChannelQueryMapper;
 import lombok.extern.slf4j.Slf4j;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -15,10 +19,14 @@ import java.util.List;
 public class ChannelQueryServiceImpl implements ChannelQueryService {
 
     private final ChannelQueryMapper channelQueryMapper;
+    private final ChannelRepository channelRepository;
+    private final ModelMapper modelMapper;
 
     @Autowired
-    public ChannelQueryServiceImpl(ChannelQueryMapper channelQueryMapper) {
+    public ChannelQueryServiceImpl(ChannelQueryMapper channelQueryMapper, ChannelRepository channelRepository, ModelMapper modelMapper) {
         this.channelQueryMapper = channelQueryMapper;
+        this.channelRepository = channelRepository;
+        this.modelMapper = modelMapper;
     }
 
     @Override
@@ -51,4 +59,11 @@ public class ChannelQueryServiceImpl implements ChannelQueryService {
 
         return sum;
     }
+
+    @Override
+    public ChannelQueryDTO findChannelByChannelId(Integer channelId) {
+        ChannelCommandEntity selectedChannel = channelRepository.findById(Long.valueOf(channelId)).get();
+        return modelMapper.map(selectedChannel, ChannelQueryDTO.class);
+    }
+
 }

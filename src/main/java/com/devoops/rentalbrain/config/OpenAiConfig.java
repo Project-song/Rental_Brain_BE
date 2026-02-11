@@ -4,6 +4,7 @@ import com.openai.client.okhttp.OpenAIOkHttpClient;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import com.openai.client.OpenAIClient;
+import org.springframework.context.annotation.Profile;
 
 
 @Configuration
