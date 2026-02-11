@@ -12,15 +12,9 @@ spring:
     password: adminadmin
 
     #    로컬 DB
-<<<<<<< HEAD
     #    url: jdbc:mariadb://localhost:3306/rental_brain
     #    username: root
     #    password: mariadb
-=======
-#    url: jdbc:mariadb://localhost:3306/rental_brain
-#    username: root
-#    password: mariadb
->>>>>>> 55ead2388a4e3f7a67ccb8652166c58283281fa8
 
     hikari:
       pool-name: HikariPool-1
