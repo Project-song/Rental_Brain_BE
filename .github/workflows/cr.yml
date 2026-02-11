@@ -166,26 +166,26 @@ jobs:
           cp -r .platform deploy/.platform
           cd deploy && zip -r deploy.zip .
 
-#      - name: Check Beanstalk Environment Status
-#        run: |
-#          STATUS=$(aws elasticbeanstalk describe-environments --region ap-northeast-2 \
-#            --environment-names Rentalbrain-b-env --query "Environments[0].Status" \
-#            --output text)
-#          if [ "$STATUS" != "Ready" ]; then
-#            echo "Environment is not Ready (current status: $STATUS)."
-#            exit 1
-#          fi
-#        env:
-#          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-#          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      - name: Check Beanstalk Environment Status
+        run: |
+          STATUS=$(aws elasticbeanstalk describe-environments --region ap-northeast-2 \
+            --environment-names Rental-brain-b-env --query "Environments[0].Status" \
+            --output text)
+          if [ "$STATUS" != "Ready" ]; then
+            echo "Environment is not Ready (current status: $STATUS)."
+            exit 1
+          fi
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
       - name: Beanstalk Deploy
         uses: einaregilsson/beanstalk-deploy@v22
         with:
           aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          application_name: rentalbrain-b
-          environment_name: Rentalbrain-b-env
+          application_name: rental-brain-b
+          environment_name: Rental-brain-b-env
           version_label: github-action-${{steps.current-time.outputs.formattedTime}}
           region: ap-northeast-2
           deployment_package: deploy/deploy.zip
